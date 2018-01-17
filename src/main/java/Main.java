@@ -19,8 +19,8 @@ public class Main {
      * IMAGE_PATH为本机图片存放目录，必须是已存在目录
      */
 //    private static final String ADB_PATH = "D:\\software\\Android\\android-sdk\\platform-tools\\adb";
-    private static final String ADB_PATH = "D:\\adb\\adb";
-    private static final String IMAGE_PATH = "D:\\Photo";
+    private static final String ADB_PATH = "/usr/local/bin/adb";
+    private static final String IMAGE_PATH = "/Local/Users/xiang.gao/IdeaProjects/study/1.githubs/MillionHero/images/";
     private static final OCRFactory OCR_FACTORY = new OCRFactory();
     private static final PatternFactory PATTERN_FACTORY = new PatternFactory();
     private static final Utils UTILS = new Utils(ADB_PATH, IMAGE_PATH);

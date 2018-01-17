@@ -15,9 +15,9 @@ import java.util.HashMap;
  */
 public class BaiDuOCR implements OCR{
     //设置APPID/AK/SK
-    private static final String APP_ID = "10697064";
-    private static final String API_KEY = "Y2Dyel1bZwvsVRS00RZ9iBzh";
-    private static final String SECRET_KEY = "ED50nYFA3GbhM9AdyoZhC0qqweP9WjtY ";
+    private static final String APP_ID = "10690267";
+    private static final String API_KEY = "Gc02gVtECiYjd4Gh76MUFAzO";
+    private static final String SECRET_KEY = "UQS0xGWkIG8LG5OYenDaGErrDyOLQtLd";
     private static final AipOcr CLIENT=new AipOcr(APP_ID, API_KEY, SECRET_KEY);
     BaiDuOCR(){
         // 可选：设置网络连接参数
@@ -55,7 +55,7 @@ public class BaiDuOCR implements OCR{
 
     public static void main(String[] args) {
         OCR ocr=new BaiDuOCR();
-        String path = "D:\\Photo\\20180114002647.png";
+        String path = "/Local/Users/xiang.gao/IdeaProjects/study/1.githubs/MillionHero/images/20180117200435.png";
         String result=ocr.getOCR(new File(path));
         System.out.println(result);
     }

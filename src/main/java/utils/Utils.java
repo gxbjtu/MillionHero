@@ -129,9 +129,11 @@ public class Utils {
     }
 
     public static void main(String[] args) {
-        String adb = "D:\\software\\Android\\android-sdk\\platform-tools\\adb";
-        String imagePath = "D:\\Photo";
-        Utils utils = new Utils(adb, imagePath);
-        utils.getImage();
+        String str = "9上个月的今天出生的婴儿是什么\n" +
+                "星座?\n" +
+                "巨蟹座\n" +
+                "摩羯座\n" +
+                "射手座";
+        System.out.println(new Utils(null, null).getInformation(str));
     }
 }
