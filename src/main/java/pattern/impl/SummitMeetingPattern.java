@@ -27,6 +27,7 @@ public class SummitMeetingPattern implements Pattern {
     private OCR ocr;
     private Utils utils;
     private ImageHelper imageHelper = new ImageHelper();
+
     SummitMeetingPattern(OCR ocr, Utils utils) {
         System.out.println("欢迎您进入冲顶大会游戏模式");
         this.ocr = ocr;
@@ -39,13 +40,13 @@ public class SummitMeetingPattern implements Pattern {
         long startTime;
         //       记录结束时间
         long endTime;
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         startTime = System.currentTimeMillis();
         //获取图片
         String imagePath = utils.getImage();
         System.out.println("图片获取成功");
         //裁剪图片
-        imageHelper.cutImage(imagePath,imagePath,START_X,START_Y,WIDTH,HEIGHT);
+        imageHelper.cutImage(imagePath, imagePath, START_X, START_Y, WIDTH, HEIGHT);
         //图像识别
         Long beginOfDetect = System.currentTimeMillis();
         String questionAndAnswers = ocr.getOCR(new File(imagePath));

@@ -43,13 +43,13 @@ public class MillionHeroPattern implements Pattern {
         long startTime;
         //       记录结束时间
         long endTime;
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         startTime = System.currentTimeMillis();
         //获取图片
         String imagePath = utils.getImage();
         System.out.println("图片获取成功");
         //裁剪图片
-        imageHelper.cutImage(imagePath,imagePath,START_X,START_Y,WIDTH,HEIGHT);
+        imageHelper.cutImage(imagePath, imagePath, START_X, START_Y, WIDTH, HEIGHT);
         //图像识别
         Long beginOfDetect = System.currentTimeMillis();
         String questionAndAnswers = ocr.getOCR(new File(imagePath));
@@ -89,7 +89,7 @@ public class MillionHeroPattern implements Pattern {
         Search[] searchAnswers = new Search[numOfAnswer];
         FutureTask[] futureQA = new FutureTask[numOfAnswer];
         FutureTask[] futureAnswers = new FutureTask[numOfAnswer];
-        FutureTask futureQuestion = new FutureTask<Long>(new BaiDuSearch(question, true));
+        FutureTask futureQuestion = new FutureTask<Long>(new BaiDuSearch(question, false));
         new Thread(futureQuestion).start();
         for (int i = 0; i < numOfAnswer; i++) {
             searchQA[i] = new BaiDuSearch((question + " " + answers[i]), false);

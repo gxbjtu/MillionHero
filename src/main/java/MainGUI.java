@@ -21,10 +21,11 @@ public class MainGUI {
     private static JTextField adbPathText;
     private static JTextField imagePathText;
     private static Pattern pattern;
-    private static ButtonGroup ocrSelectionButton=new ButtonGroup();
-    private static int ocrSelection=1;
-    private static int patternSelection=1;
+    private static ButtonGroup ocrSelectionButton = new ButtonGroup();
+    private static int ocrSelection = 1;
+    private static int patternSelection = 1;
     private static JTextArea resultTextArea;
+
     public static void main(String[] args) {
         // 创建 JFrame 实例
         JFrame frame = new JFrame("答题助手");
@@ -45,7 +46,8 @@ public class MainGUI {
         // 设置界面可见
         frame.setVisible(true);
     }
-//    创建文本域用于用户输入adb路径
+
+    //    创建文本域用于用户输入adb路径
     private static void addAdbPath(JPanel panel) {
         JLabel adbPathLabel = new JLabel("adb路径：");
         adbPathLabel.setBounds(10, 20, 100, 25);
@@ -54,6 +56,7 @@ public class MainGUI {
         adbPathText.setBounds(100, 20, 165, 25);
         panel.add(adbPathText);
     }
+
     //         创建图片存放路径
     private static void addImagePath(JPanel panel) {
         JLabel imagePathLabel = new JLabel("图片存放路径：");
@@ -63,52 +66,56 @@ public class MainGUI {
         imagePathText.setBounds(100, 40, 165, 25);
         panel.add(imagePathText);
     }
+
     //         创建图片存放路径
     private static void addOCRSelection(JPanel panel) {
         JLabel ocrSelectionLabel = new JLabel("OCR方式：");
         ocrSelectionLabel.setBounds(10, 60, 100, 25);
-        addOCRSelection(panel,100,"TessOCR",1);
-        addOCRSelection(panel,300,"BaiDuOCR",2);
+        addOCRSelection(panel, 100, "TessOCR", 1);
+        addOCRSelection(panel, 300, "BaiDuOCR", 2);
         panel.add(ocrSelectionLabel);
     }
-    private static void addOCRSelection(JPanel panel, int X, String text, final int selection){
-        final JRadioButton ocrButton=new JRadioButton(text);
+
+    private static void addOCRSelection(JPanel panel, int X, String text, final int selection) {
+        final JRadioButton ocrButton = new JRadioButton(text);
         ocrButton.setBounds(X, 60, 165, 25);
         ocrSelectionButton.add(ocrButton);
         panel.add(ocrButton);
-        ActionListener listener=new ActionListener() {
+        ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ocrSelection=selection;
+                ocrSelection = selection;
             }
         };
         ocrButton.addActionListener(listener);
     }
+
     //增加设置完成按钮
-    private static void addSetFinishButton(JPanel panel){
-        final JButton setFinishButton=new JButton("设置完成");
+    private static void addSetFinishButton(JPanel panel) {
+        final JButton setFinishButton = new JButton("设置完成");
         setFinishButton.setBounds(40, 90, 100, 25);
         panel.add(setFinishButton);
-        ActionListener listener=new ActionListener() {
+        ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Utils utils=new Utils(adbPathText.getText()+"\\adb",imagePathText.getText());
+                Utils utils = new Utils(adbPathText.getText() + "\\adb", imagePathText.getText());
                 OCR ocr = OCR_FACTORY.getOcr(ocrSelection);
                 pattern = PATTERN_FACTORY.getPattern(patternSelection, ocr, utils);
             }
         };
         setFinishButton.addActionListener(listener);
     }
+
     //增加获取答案按钮
-    private static void addRunButton(JPanel panel){
-        final JButton runButton=new JButton("获取答案");
+    private static void addRunButton(JPanel panel) {
+        final JButton runButton = new JButton("获取答案");
         runButton.setBounds(160, 90, 100, 25);
         panel.add(runButton);
-        ActionListener listener=new ActionListener() {
+        ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String result=pattern.run();
+                    String result = pattern.run();
                     System.out.println(result);
                     resultTextArea.setText(result);
                 } catch (UnsupportedEncodingException e1) {
@@ -118,9 +125,10 @@ public class MainGUI {
         };
         runButton.addActionListener(listener);
     }
+
     //         创建图片存放路径
     private static void addResultTextArea(JPanel panel) {
-        resultTextArea=new JTextArea();
+        resultTextArea = new JTextArea();
         resultTextArea.setBounds(10, 120, 400, 400);
         panel.add(resultTextArea);
     }

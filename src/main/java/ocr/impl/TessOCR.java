@@ -25,6 +25,12 @@ public class TessOCR implements OCR {
         System.out.println("欢迎您使用TessOCR进行文字识别");
     }
 
+    public static void main(String[] args) {
+        String path = "D:\\23910392848779368.png";
+        TessOCR tessOCR = new TessOCR();
+        System.out.println(tessOCR.getOCR(new File(path)));
+    }
+
     @Override
     public String getOCR(File file) {
         Long start = System.currentTimeMillis();
@@ -34,14 +40,8 @@ public class TessOCR implements OCR {
         } catch (TesseractException e) {
             System.err.println("tessOCR提取图片文字信息失败");
         }
-        float time=(System.currentTimeMillis()-start)/(1000f);
-        System.out.println("tessOCR提取信息成功，耗时："+time+"s");
+        float time = (System.currentTimeMillis() - start) / (1000f);
+        System.out.println("tessOCR提取信息成功，耗时：" + time + "s");
         return result;
-    }
-
-    public static void main(String[] args) {
-        String path = "D:\\23910392848779368.png";
-        TessOCR tessOCR = new TessOCR();
-        System.out.println(tessOCR.getOCR(new File(path)));
     }
 }

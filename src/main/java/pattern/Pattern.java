@@ -1,7 +1,5 @@
 package pattern;
 
-import ocr.OCR;
-
 import java.io.UnsupportedEncodingException;
 
 /**

@@ -18,6 +18,14 @@ import java.util.Iterator;
  * @author lingfengsan
  */
 public class ImageHelper {
+    public static void main(String[] args) throws IOException {
+        String src = "D:\\20180111214256.png";
+        String dest = "D:\\18.png";
+        long start = System.currentTimeMillis();
+        new ImageHelper().cutImage(src, dest, 100, 100, 100, 100);
+        System.out.println(System.currentTimeMillis() - start);
+    }
+
     /**
      * 图片裁剪通用接口
      *
@@ -29,8 +37,8 @@ public class ImageHelper {
      * @param h    图片高度
      * @throws IOException 异常处理
      */
-    public void cutImage(String src, String dest, int x, int y, int w, int h)  {
-        try{
+    public void cutImage(String src, String dest, int x, int y, int w, int h) {
+        try {
             Iterator iterator = ImageIO.getImageReadersByFormatName("png");
             ImageReader reader = (ImageReader) iterator.next();
             InputStream in = new FileInputStream(src);
@@ -41,18 +49,10 @@ public class ImageHelper {
             param.setSourceRegion(rect);
             BufferedImage bi = reader.read(0, param);
             ImageIO.write(bi, "png", new File(dest));
-        }catch (IOException e){
+        } catch (IOException e) {
             System.err.println("裁剪图片失败");
         }
 
 
-    }
-
-    public static void main(String[] args) throws IOException {
-        String src = "D:\\20180111214256.png";
-        String dest=  "D:\\18.png";
-        long start=System.currentTimeMillis();
-        new ImageHelper().cutImage(src,dest,100,100,100,100);
-        System.out.println(System.currentTimeMillis()-start);
     }
 }

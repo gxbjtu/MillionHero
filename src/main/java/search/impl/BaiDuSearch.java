@@ -26,13 +26,14 @@ public class BaiDuSearch implements Search {
         this.path = "http://www.baidu.com/s?tn=ichuner&lm=-1&word=" +
                 URLEncoder.encode(question, "gb2312") + "&rn=1";
     }
+
     @Override
     public Long search() throws IOException {
         boolean findIt = false;
         String line = null;
         while (!findIt) {
             URL url = new URL(path);
-            BufferedReader breaded = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+            BufferedReader breaded = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             while ((line = breaded.readLine()) != null) {
                 if (line.contains("百度为您找到相关结果约")) {
                     findIt = true;

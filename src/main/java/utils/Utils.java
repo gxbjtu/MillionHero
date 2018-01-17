@@ -17,17 +17,49 @@ import java.util.Date;
  * @author lingfengsan
  */
 public class Utils {
+    private static final Long MIN_IMAGE_SIZE = 1000L;
     /**
      * ABD_PATH此处应更改为自己的adb目录
      * HERO_PATH更改自己存放图片的地址
      */
     private String adbPath;
     private String imagePath;
-    private static final Long MIN_IMAGE_SIZE = 1000L;
-    public Utils(){}
+
+    public Utils() {
+    }
+
     public Utils(String adbPath, String imagePath) {
         this.adbPath = adbPath;
         this.imagePath = imagePath;
+    }
+
+    /**
+     * 对rank值进行排序
+     *
+     * @param floats pmi值
+     * @return 返回排序的rank
+     */
+    public static int[] rank(float[] floats) {
+        int[] rank = new int[floats.length];
+        float[] f = Arrays.copyOf(floats, floats.length);
+        Arrays.sort(f);
+        for (int i = 0; i < floats.length; i++) {
+            for (int j = 0; j < floats.length; j++) {
+                if (f[i] == floats[j]) {
+                    rank[i] = j;
+                }
+            }
+        }
+        return rank;
+    }
+
+    public static void main(String[] args) {
+        String str = "9上个月的今天出生的婴儿是什么\n" +
+                "星座?\n" +
+                "巨蟹座\n" +
+                "摩羯座\n" +
+                "射手座";
+        System.out.println(new Utils(null, null).getInformation(str));
     }
 
     public void openBrowser(String path) {
@@ -62,22 +94,24 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
     public Information getInformation(String str) {
         //先去除空行
         str = str.replaceAll("((\r\n)|\n)[\\s\t ]*(\\1)+", "$1").
                 replaceAll("^((\r\n)|\n)", "");
-        str=str.replace(" ","");
+        str = str.replace(" ", "");
         //问号统一替换为英文问号防止报错
-        str=str.replace("？","?");
-        int begin=(str.charAt(1)>='0'&& str.charAt(1)<='9')?2:1;
-        str=str.replaceFirst("\\.","");
+        str = str.replace("？", "?");
+        int begin = (str.charAt(1) >= '0' && str.charAt(1) <= '9') ? 2 : 1;
+        str = str.replaceFirst("\\.", "");
         String question = str.trim().substring(begin, str.indexOf('?') + 1);
         question = question.replaceAll("((\r\n)|\n)", "");
         System.out.println(question);
         String remain = str.substring(str.indexOf("?") + 1);
         String[] ans = remain.trim().split("\n");
-        return new Information(question,ans);
+        return new Information(question, ans);
     }
+
     public String getImage() {
         //获取当前时间作为名字
         Date current = new Date();
@@ -86,17 +120,17 @@ public class Utils {
         File curPhoto = new File(imagePath, curDate + ".png");
         //截屏存到手机本地
         try {
-                Process process = Runtime.getRuntime().exec(adbPath
-                        + " shell /system/bin/screencap -p /sdcard/screenshot.png");
-                process.waitFor();
-                //将截图放在电脑本地
-                process = Runtime.getRuntime().exec(adbPath
-                        + " pull /sdcard/screenshot.png " + curPhoto.getAbsolutePath());
-                process.waitFor();
-                if(!curPhoto.exists() || curPhoto.length() < MIN_IMAGE_SIZE){
-                    System.err.println("截取图片失败，请检查环境搭建");
-                }
-                //返回当前图片名字
+            Process process = Runtime.getRuntime().exec(adbPath
+                    + " shell /system/bin/screencap -p /sdcard/screenshot.png");
+            process.waitFor();
+            //将截图放在电脑本地
+            process = Runtime.getRuntime().exec(adbPath
+                    + " pull /sdcard/screenshot.png " + curPhoto.getAbsolutePath());
+            process.waitFor();
+            if (!curPhoto.exists() || curPhoto.length() < MIN_IMAGE_SIZE) {
+                System.err.println("截取图片失败，请检查环境搭建");
+            }
+            //返回当前图片名字
             return curPhoto.getAbsolutePath();
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,35 +139,5 @@ public class Utils {
         }
         System.err.println("获取图片失败");
         return null;
-    }
-
-
-    /**
-     * 对rank值进行排序
-     *
-     * @param floats pmi值
-     * @return 返回排序的rank
-     */
-    public static int[] rank(float[] floats) {
-        int[] rank = new int[floats.length];
-        float[] f = Arrays.copyOf(floats, floats.length);
-        Arrays.sort(f);
-        for (int i = 0; i < floats.length; i++) {
-            for (int j = 0; j < floats.length; j++) {
-                if (f[i] == floats[j]) {
-                    rank[i] = j;
-                }
-            }
-        }
-        return rank;
-    }
-
-    public static void main(String[] args) {
-        String str = "9上个月的今天出生的婴儿是什么\n" +
-                "星座?\n" +
-                "巨蟹座\n" +
-                "摩羯座\n" +
-                "射手座";
-        System.out.println(new Utils(null, null).getInformation(str));
     }
 }
