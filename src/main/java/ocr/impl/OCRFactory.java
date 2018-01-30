@@ -8,16 +8,15 @@ import ocr.OCR;
  * @author lingfengsan
  */
 public class OCRFactory {
-    public OCR getOcr(int choice) {
-        switch (choice) {
-            case 1: {
-                return new TessOCR();
-            }
-            case 2: {
+    public OCR getOcr(int choice){
+        switch (choice){
+            case 2:{
+                System.out.println("欢迎使用百度OCR");
                 return new BaiDuOCR();
             }
-            default: {
-                return new TessOCR();
+            default:{
+                System.out.println("欢迎使用百度OCR");
+                return new BaiDuOCR();
             }
         }
 

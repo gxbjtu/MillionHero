@@ -1,11 +1,14 @@
 package pattern.impl;
 
+import com.baidu.aip.nlp.AipNlp;
 import ocr.OCR;
 import pattern.Pattern;
-import search.Search;
-import search.impl.BaiDuSearch;
+import search.impl.SearchFactory;
+import similarity.Similarity;
+import similarity.impl.BaiDuSimilarity;
+import similarity.impl.SimilarityFactory;
 import utils.ImageHelper;
-import utils.Information;
+import pojo.Information;
 import utils.Utils;
 
 import java.io.File;
@@ -14,25 +17,40 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 /**
- * Created by 618 on 2018/1/12.
+ * Created by lingfengsan on 2018/1/18.
  *
  * @author lingfengsan
  */
-public class SummitMeetingPattern implements Pattern {
+public class CommonPattern implements Pattern {
     private static final String QUESTION_FLAG = "?";
-    private static final int START_X = 80;
-    private static final int START_Y = 300;
-    private static final int WIDTH = 900;
-    private static final int HEIGHT = 700;
+    private static int[] startX = {100,100, 80};
+    private static int[] startY = {300,300, 300};
+    private static int[] width = {900,900, 900};
+    private static int[] height = {900,900, 700};
+    private ImageHelper imageHelper = new ImageHelper();
+    private SearchFactory searchFactory=new SearchFactory();
+    private int patterSelection;
+    private int searchSelection;
     private OCR ocr;
     private Utils utils;
-    private ImageHelper imageHelper = new ImageHelper();
 
-    SummitMeetingPattern(OCR ocr, Utils utils) {
-        System.out.println("欢迎您进入冲顶大会游戏模式");
+    public void setPatterSelection(int patterSelection) {
+        this.patterSelection = patterSelection;
+    }
+
+    public void setSearchSelection(int searchSelection) {
+        this.searchSelection = searchSelection;
+    }
+
+    public void setOcr(OCR ocr) {
         this.ocr = ocr;
+    }
+
+    public void setUtils(Utils utils) {
         this.utils = utils;
     }
+
+
 
     @Override
     public String run() throws UnsupportedEncodingException {
@@ -46,10 +64,12 @@ public class SummitMeetingPattern implements Pattern {
         String imagePath = utils.getImage();
         System.out.println("图片获取成功");
         //裁剪图片
-        imageHelper.cutImage(imagePath, imagePath, START_X, START_Y, WIDTH, HEIGHT);
+        imageHelper.cutImage(imagePath, imagePath,
+                startX[patterSelection],startY[patterSelection], width[patterSelection], height[patterSelection]);
         //图像识别
         Long beginOfDetect = System.currentTimeMillis();
         String questionAndAnswers = ocr.getOCR(new File(imagePath));
+        sb.append(questionAndAnswers);
         System.out.println("识别成功");
         System.out.println("识别时间：" + (System.currentTimeMillis() - beginOfDetect));
         if (questionAndAnswers == null || !questionAndAnswers.contains(QUESTION_FLAG)) {
@@ -73,64 +93,48 @@ public class SummitMeetingPattern implements Pattern {
         for (String answer : answers) {
             sb.append(answer).append("\n");
         }
-        //搜索
-        long countQuestion = 1;
+        //求相关性
         int numOfAnswer = answers.length > 3 ? 4 : answers.length;
-        long[] countQA = new long[numOfAnswer];
-        long[] countAnswer = new long[numOfAnswer];
-
-        int maxIndex = 0;
-
-        Search[] searchQA = new Search[numOfAnswer];
-        Search[] searchAnswers = new Search[numOfAnswer];
-        FutureTask[] futureQA = new FutureTask[numOfAnswer];
-        FutureTask[] futureAnswers = new FutureTask[numOfAnswer];
-        FutureTask futureQuestion = new FutureTask<Long>(new BaiDuSearch(question, true));
-        new Thread(futureQuestion).start();
+        double[] result=new double[numOfAnswer];
+        Similarity[] similarities= new Similarity[numOfAnswer];
+        FutureTask[] futureTasks=new FutureTask[numOfAnswer];
+        BaiDuSimilarity.setClient(new AipNlp("10732092","pdAtmzlooEbrcfYG4l0kIluf",
+                "sHjPBnKt58crPuFogTgQ5Wki0TrHYO2c"));
         for (int i = 0; i < numOfAnswer; i++) {
-            searchQA[i] = new BaiDuSearch((question + " " + answers[i]), false);
-            searchAnswers[i] = new BaiDuSearch(answers[i], false);
-
-            futureQA[i] = new FutureTask<Long>(searchQA[i]);
-            futureAnswers[i] = new FutureTask<Long>(searchAnswers[i]);
-            new Thread(futureQA[i]).start();
-            new Thread(futureAnswers[i]).start();
+            similarities[i]=SimilarityFactory.getSimlarity(2,question,answers[i]);
+            futureTasks[i]=new FutureTask<Double>(similarities[i]);
+            new Thread(futureTasks[i]).start();
         }
-        try {
-            while (!futureQuestion.isDone()) {
-            }
-            countQuestion = (Long) futureQuestion.get();
-            for (int i = 0; i < numOfAnswer; i++) {
-                while (true) {
-                    if (futureAnswers[i].isDone() && futureQA[i].isDone()) {
-                        break;
-                    }
+        for (int i = 0; i < numOfAnswer; i++) {
+            while (true){
+                if(futureTasks[i].isDone()){
+                    break;
                 }
-                countQA[i] = (Long) futureQA[i].get();
-                countAnswer[i] = (Long) futureAnswers[i].get();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            try {
+                result[i]=  (Double) futureTasks[i].get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
-        float[] ans = new float[numOfAnswer];
-        for (int i = 0; i < numOfAnswer; i++) {
-            ans[i] = (float) countQA[i] / (float) (countQuestion * countAnswer[i]);
-            maxIndex = (ans[i] > ans[maxIndex]) ? i : maxIndex;
-        }
-        //根据pmi值进行打印搜索结果
-        int[] rank = Utils.rank(ans);
-        for (int i : rank) {
+        //搜索
 
+        FutureTask[] futureQuestion = new FutureTask[1];
+        futureQuestion[0]=new FutureTask<Long>(searchFactory.getSearch(searchSelection,question,true));
+        new Thread(futureQuestion[0]).start();
+
+
+        //根据pmi值进行打印搜索结果
+        int[] rank = Utils.rank(result);
+        for (int i : rank) {
             sb.append(answers[i]);
-            sb.append(" countQA:").append(countQA[i]);
-            sb.append(" countAnswer:").append(countAnswer[i]);
-            sb.append(" ans:").append(ans[i]).append("\n");
+            sb.append(" 相似度为:").append(result[i]).append("\n");
         }
 
         sb.append("--------最终结果-------\n");
-        sb.append(answers[maxIndex]);
+        sb.append(answers[rank[rank.length-1]]);
         endTime = System.currentTimeMillis();
         float excTime = (float) (endTime - startTime) / 1000;
 

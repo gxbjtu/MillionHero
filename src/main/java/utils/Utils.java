@@ -1,15 +1,17 @@
 package utils;
 
+import pojo.Config;
+import pojo.Information;
+
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by lingfengsan on 2018/1/12.
@@ -17,7 +19,6 @@ import java.util.Date;
  * @author lingfengsan
  */
 public class Utils {
-    private static final Long MIN_IMAGE_SIZE = 1000L;
     /**
      * ABD_PATH此处应更改为自己的adb目录
      * HERO_PATH更改自己存放图片的地址
@@ -25,9 +26,9 @@ public class Utils {
     private String adbPath;
     private String imagePath;
 
-    public Utils() {
-    }
-
+    private static final Long MIN_IMAGE_SIZE = 1000L;
+    private static Properties heroProperties = new Properties();
+    public Utils(){}
     public Utils(String adbPath, String imagePath) {
         this.adbPath = adbPath;
         this.imagePath = imagePath;
@@ -51,15 +52,6 @@ public class Utils {
             }
         }
         return rank;
-    }
-
-    public static void main(String[] args) {
-        String str = "9上个月的今天出生的婴儿是什么\n" +
-                "星座?\n" +
-                "巨蟹座\n" +
-                "摩羯座\n" +
-                "射手座";
-        System.out.println(new Utils(null, null).getInformation(str));
     }
 
     public void openBrowser(String path) {
@@ -139,5 +131,65 @@ public class Utils {
         }
         System.err.println("获取图片失败");
         return null;
+    }
+
+    /**
+     * 对rank值进行排序
+     *
+     * @param floats pmi值
+     * @return 返回排序的rank
+     */
+    public static int[] rank(double[] floats) {
+        int[] rank = new int[floats.length];
+        double[] f = Arrays.copyOf(floats, floats.length);
+        Arrays.sort(f);
+        for (int i = 0; i < floats.length; i++) {
+            for (int j = 0; j < floats.length; j++) {
+                if (f[i] == floats[j]) {
+                    rank[i] = j;
+                }
+            }
+        }
+        return rank;
+    }
+    public static void storeConfig() throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream("hero.properties", false);
+        heroProperties.setProperty("APP_ID", Config.getAppId());
+        heroProperties.setProperty("API_KEY", Config.getApiKey());
+        heroProperties.setProperty("SECRET_KEY",Config.getSecretKey());
+        heroProperties.setProperty("ADB_PATH", Config.getAdbPath());
+        heroProperties.setProperty("PHOTO_PATH", Config.getPhotoPath());
+        heroProperties.setProperty("NlpAPP_ID", Config.getNlpAppId());
+        heroProperties.setProperty("NlpAPI_KEY", Config.getNlpApiKey());
+        heroProperties.setProperty("NlpSECRET_KEY", Config.getNlpSecretKey());
+        heroProperties.store(fileOutputStream, "million hero properties");
+        fileOutputStream.close();
+    }
+    public static void loadConfig() throws IOException {
+        InputStream in = new BufferedInputStream(new FileInputStream("hero.properties"));
+        heroProperties.load(in);
+        for (String key : heroProperties.stringPropertyNames()) {
+            Config.set(key, heroProperties.getProperty(key));
+        }
+        in.close();
+    }
+    public static void initialConfig() throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream("hero.properties", true);
+        heroProperties.setProperty("ADB_PATH", "D:\\adb\\adb");
+        heroProperties.setProperty("PHOTO_PATH", "D:\\Photo");
+        heroProperties.setProperty("APP_ID", "APP_ID");
+        heroProperties.setProperty("API_KEY", "API_KEY");
+        heroProperties.setProperty("SECRET_KEY", "SECRET_KEY");
+        heroProperties.setProperty("NlpAPP_ID", "NlpAPP_ID");
+        heroProperties.setProperty("NlpAPI_KEY", "NlpAPI_KEY");
+        heroProperties.setProperty("NlpSECRET_KEY", "NlpSECRET_KEY");
+        heroProperties.store(fileOutputStream, "million hero properties");
+        fileOutputStream.close();
+    }
+    public static void main(String[] args) {
+        String adb = "D:\\software\\Android\\android-sdk\\platform-tools\\adb";
+        String imagePath = "D:\\Photo";
+        Utils utils = new Utils(adb, imagePath);
+        utils.getImage();
     }
 }

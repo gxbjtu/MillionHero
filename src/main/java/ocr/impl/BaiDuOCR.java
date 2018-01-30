@@ -5,8 +5,11 @@ import exception.NoRemainingException;
 import ocr.OCR;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pojo.Config;
+import utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -14,39 +17,31 @@ import java.util.HashMap;
  *
  * @author lingfengsan
  */
-public class BaiDuOCR implements OCR {
-    //设置APPID/AK/SK
-    private static final String APP_ID = "10690267";
-    private static final String API_KEY = "Gc02gVtECiYjd4Gh76MUFAzO";
-    private static final String SECRET_KEY = "UQS0xGWkIG8LG5OYenDaGErrDyOLQtLd";
-    private static final AipOcr CLIENT = new AipOcr(APP_ID, API_KEY, SECRET_KEY);
+public class BaiDuOCR implements OCR{
+    private static AipOcr client;
 
-    BaiDuOCR() {
-        // 可选：设置网络连接参数
-        CLIENT.setConnectionTimeoutInMillis(2000);
-        CLIENT.setSocketTimeoutInMillis(60000);
-        System.out.println("欢迎您使用百度OCR进行文字识别");
-    }
-
-    public static void main(String[] args) {
-        OCR ocr = new BaiDuOCR();
-        String path = "/Local/Users/xiang.gao/IdeaProjects/study/1.githubs/MillionHero/images/20180117200435.png";
-        String result = ocr.getOCR(new File(path));
-        System.out.println(result);
+    public static void setClient(AipOcr client) {
+        BaiDuOCR.client = client;
     }
 
     @Override
     public String getOCR(File file) {
-        Long start = System.currentTimeMillis();
-        String path = file.getAbsolutePath();
+        System.out.println(Config.getAppId());
+        System.out.println(Config.getApiKey());
+        System.out.println(Config.getSecretKey());
+        Long start=System.currentTimeMillis();
+        String path=file.getAbsolutePath();
         // 调用接口
-        JSONObject res = CLIENT.basicGeneral(path, new HashMap<String, String>());
-        String searchResult = res.toString();
-        if (searchResult.contains("error_msg")) {
+        JSONObject res = client.basicGeneral(path, new HashMap<String, String>());
+        String searchResult=res.toString();
+        if(searchResult.contains("error_msg")){
             try {
                 throw new NoRemainingException("OCR可使用次数不足");
             } catch (NoRemainingException e) {
-                return "OCR可使用次数不足,您可使用TessOCR";
+                return "OCR可使用次数不足,请使用自己的OCR\n" +
+                        "获取方式见:\n" +
+                        "https://github.com/lingfengsan/MillionHero/wiki/Android操作步骤\n" +
+                        "或者您可选择使用TessOCR\n";
             }
         }
         System.out.println(res.toString());
@@ -58,8 +53,21 @@ public class BaiDuOCR implements OCR {
             sb.append(str);
             sb.append("\n");
         }
-        Long time = System.currentTimeMillis() - start;
-        System.out.println("tessOCR提取信息成功，耗时：" + time + "s");
+
+        Long time=(System.currentTimeMillis()-start)/1000;
+        System.out.println("tessOCR提取信息成功，耗时："+time+"s");
         return sb.toString();
     }
+
+    public static void main(String[] args) throws IOException {
+        OCR ocr=new BaiDuOCR();
+        Utils.loadConfig();
+        client=new AipOcr(Config.getAppId().trim(),
+                Config.getApiKey().trim(), Config.getSecretKey().trim());
+        String path = "D:\\Photo\\123.png";
+        String result=ocr.getOCR(new File(path));
+        System.out.println(result);
+    }
+
+
 }

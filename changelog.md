@@ -1,3 +1,15 @@
++ 2018-01-25
+  + 增加百度短文本识别API，欢迎尝试[短文本相似度](https://console.bce.baidu.com/ai/#/ai/nlp/overview/index)，请去该链接申请该服务
+  + 取消使用TessOCR
++ 2018-01-24
+  + 不在支持命令行模式，请运行MainGUI
++ 2018-01-22
+  + 增加了本地保存配置信息
+  + 建议使用百度OCR+搜狗，正确率更高。
+  + 建议使用界面模式，即运行MainGUI
++ 2018-01-19
+  + 增加了搜狗搜索方式
+  + 优化了界面设置
 + 2018-01-15
   +  百度OCR功能上线，欢迎使用
   +  百度OCR的配置请前往[Android操作步骤](https://github.com/lingfengsan/MillionHero/wiki/Android%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4)
